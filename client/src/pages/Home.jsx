@@ -69,7 +69,7 @@ const Home = () => {
                 <Truck size={28} />
               </div>
               <h3 className="font-medium text-gray-900 mb-2">Free Shipping</h3>
-              <p className="text-sm text-gray-500">On orders over $50</p>
+              <p className="text-sm text-gray-500">On orders over ₹50</p>
             </div>
 
             <div className="flex flex-col items-center text-center group">
