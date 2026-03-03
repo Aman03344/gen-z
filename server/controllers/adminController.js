@@ -1,4 +1,5 @@
 const Product = require("../models/productModel");
+const userModel = require("../models/userModel");
 
 const addProduct = async (req, res) => {
   try {
@@ -121,6 +122,17 @@ const deleteProduct = async (req, res) => {
       success: false,
       message: error.message,
     });
+  }
+};
+
+const getAllUsers = async (req, res) => {
+  try {
+    const users = await userModel.find();
+    if (!users) {
+      res.status(404).json(users);
+    }
+  } catch (error) {
+    res.status(500).json({ message: error.message });
   }
 };
 

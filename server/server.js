@@ -1,6 +1,9 @@
 const express = require("express");
 const connectDB = require("./config/dbConfig");
 const errhandler = require("./middlewares/errHandler");
+const cors = require("cors");
+const cookieParser = require("cookie-parser");
+
 require("colors");
 require("dotenv").config();
 
@@ -20,6 +23,7 @@ app.get("/", (req, res) => {
 app.use("/api/auth", require("./routes/authRoute"));
 app.use("/api/products", require("./routes/productRoute"));
 app.use("/api/cart", require("./routes/cartRoute"));
+app.use("/api/order", require("./routes/orderRoute"));
 
 app.use("/api/admin", require("./routes/adminRoute"));
 

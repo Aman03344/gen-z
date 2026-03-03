@@ -5,12 +5,13 @@ const {
   updateProduct,
   deleteProduct,
 } = require("../controllers/adminController");
+const adminProtect = require("../middlewares/adminMiddleware");
 
 const router = express.Router();
 
 // product api's
-router.post("/add/product", protect, addProduct);
-router.put("/product/:pid", protect, updateProduct);
-router.delete("/product/:pid", protect, deleteProduct);
+router.post("/add/product", adminProtect, addProduct);
+router.put("/product/:pid", adminProtect, updateProduct);
+router.delete("/product/:pid", adminProtect, deleteProduct);
 
 module.exports = router;

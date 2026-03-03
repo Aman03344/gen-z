@@ -9,18 +9,19 @@ const {
   loginOtpVerify,
   resendLoginOTP,
 } = require("../controllers/authController");
+const limiter = require("../middlewares/rateLimiterMiddleware");
 
 const router = express.Router();
 
 // register
-router.post("/register", register);
-router.post("/verify-register-otp", verifyOTP);
-router.post("/resend-register-otp", resendOTP);
+router.post("/register", limiter, register);
+router.post("/verify-register-otp", limiter, verifyOTP);
+router.post("/resend-register-otp", limiter, resendOTP);
 
 // login
-router.post("/login", loginWithOTP);
-router.post("/verify-login-otp", loginOtpVerify);
-router.post("/resend-login-otp", resendLoginOTP);
+router.post("/login", limiter, loginWithOTP);
+router.post("/verify-login-otp", limiter, loginOtpVerify);
+router.post("/resend-login-otp", limiter, resendLoginOTP);
 // router.get("/all-users",getAllUsers)
 
 router.get("/private", protect, privateRoute);
