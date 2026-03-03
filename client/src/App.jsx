@@ -13,6 +13,9 @@ import Users from "./pages/admin/Users";
 import Products from "./pages/admin/Products";
 import Orders from "./pages/admin/Orders";
 import Revenue from "./pages/admin/Revenue";
+import MyCart from "./pages/MyCart";
+import Checkout from "./pages/Checkout";
+import Profile from "./pages/Profile";
 
 function App() {
   return (
@@ -24,6 +27,9 @@ function App() {
           <Route path="product/:id" element={<ProductDetails />} />
           <Route path="about" element={<About />} />
           <Route path="contact" element={<Contact />} />
+          <Route path="profile" element={<Profile />} />
+          <Route path="mycart" element={<MyCart />} />
+          <Route path="checkout" element={<Checkout />} />
         </Route>
 
         <Route path="login" element={<Login />} />
