@@ -16,6 +16,8 @@ import Revenue from "./pages/admin/Revenue";
 import MyCart from "./pages/MyCart";
 import Checkout from "./pages/Checkout";
 import Profile from "./pages/Profile";
+import VerifyRegisterOtp from "./pages/VerifyRegisterOtp";
+import VerifyLoginOtp from "./pages/VerifyLoginOtp";
 
 function App() {
   return (
@@ -32,8 +34,10 @@ function App() {
           <Route path="checkout" element={<Checkout />} />
         </Route>
 
-        <Route path="login" element={<Login />} />
         <Route path="register" element={<Register />} />
+        <Route path="/verify-register-otp" element={<VerifyRegisterOtp />} />
+        <Route path="/verify-login-otp" element={<VerifyLoginOtp />} />
+        <Route path="login" element={<Login />} />
 
         <Route path="/admin" element={<AdminLayout />}>
           <Route index element={<Dashboard />} />

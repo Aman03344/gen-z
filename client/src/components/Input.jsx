@@ -15,6 +15,7 @@ const Input = ({
       )}
       <input
         type={type}
+        required
         placeholder={placeholder}
         className={`w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all ${error ? "border-red-500" : ""} ${className}`}
         {...props}

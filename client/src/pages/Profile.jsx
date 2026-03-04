@@ -122,26 +122,7 @@ const Profile = () => {
       tracking: "TRK987654321",
       deliveryDate: "2024-02-20",
     },
-    {
-      id: "ORD-003",
-      date: "2024-02-05",
-      status: "processing",
-      total: 159.98,
-      items: [
-        {
-          id: 4,
-          name: "Classic White Shirt",
-          price: 59.99,
-          quantity: 2,
-          size: "L",
-          color: "White",
-          image:
-            "https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?w=500",
-        },
-      ],
-      tracking: null,
-      deliveryDate: "2024-02-25",
-    },
+
     {
       id: "ORD-004",
       date: "2024-01-28",
@@ -211,13 +192,7 @@ const Profile = () => {
     );
   };
 
-  const tabs = [
-    { id: "orders", label: "My Orders", icon: Package },
-    { id: "wishlist", label: "Wishlist", icon: Heart },
-    { id: "addresses", label: "Addresses", icon: MapPin },
-    { id: "payments", label: "Payment Methods", icon: CreditCard },
-    { id: "settings", label: "Settings", icon: Settings },
-  ];
+  const tabs = [{ id: "orders", label: "My Orders", icon: Package }];
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -403,68 +378,8 @@ const Profile = () => {
                 </div>
               )}
 
-              {/* Wishlist Tab */}
-              {activeTab === "wishlist" && (
-                <div>
-                  <h2 className="text-xl font-medium text-gray-900 mb-6">
-                    My Wishlist
-                  </h2>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {wishlist.map((item) => (
-                      <div
-                        key={item.id}
-                        className="border border-gray-200 rounded-xl p-4 hover:shadow-md transition-shadow"
-                      >
-                        <div className="flex gap-4">
-                          <img
-                            src={item.image}
-                            alt={item.name}
-                            className="w-20 h-20 object-cover rounded-lg"
-                          />
-                          <div className="flex-1">
-                            <h3 className="text-sm font-medium text-gray-900">
-                              {item.name}
-                            </h3>
-                            <div className="flex items-baseline gap-2 mt-1">
-                              <span className="text-lg font-medium text-gray-900">
-                                ₹{item.price}
-                              </span>
-                              {item.originalPrice && (
-                                <span className="text-sm text-gray-400 line-through">
-                                  ₹{item.originalPrice}
-                                </span>
-                              )}
-                            </div>
-                            {item.inStock ? (
-                              <p className="text-xs text-green-600 mt-1">
-                                In Stock
-                              </p>
-                            ) : (
-                              <p className="text-xs text-red-600 mt-1">
-                                Out of Stock
-                              </p>
-                            )}
-                          </div>
-                        </div>
-                        <div className="flex gap-2 mt-4">
-                          <button className="flex-1 bg-gray-900 text-white py-2 rounded-lg text-sm font-medium hover:bg-gray-800 transition-colors">
-                            Add to Cart
-                          </button>
-                          <button className="p-2 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
-                            <Heart
-                              size={18}
-                              className="text-gray-600 fill-current text-red-500"
-                            />
-                          </button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
               {/* Addresses Tab */}
-              {activeTab === "addresses" && (
+              {/* {activeTab === "addresses" && (
                 <div>
                   <div className="flex items-center justify-between mb-6">
                     <h2 className="text-xl font-medium text-gray-900">
@@ -515,10 +430,10 @@ const Profile = () => {
                     ))}
                   </div>
                 </div>
-              )}
+              )} */}
 
               {/* Payment Methods Tab */}
-              {activeTab === "payments" && (
+              {/* {activeTab === "payments" && (
                 <div>
                   <div className="flex items-center justify-between mb-6">
                     <h2 className="text-xl font-medium text-gray-900">
@@ -572,162 +487,9 @@ const Profile = () => {
                     ))}
                   </div>
                 </div>
-              )}
+              )} */}
 
               {/* Settings Tab */}
-              {activeTab === "settings" && (
-                <div>
-                  <h2 className="text-xl font-medium text-gray-900 mb-6">
-                    Account Settings
-                  </h2>
-
-                  <div className="space-y-6">
-                    {/* Profile Information */}
-                    <div className="border-b border-gray-200 pb-6">
-                      <div className="flex items-center justify-between mb-4">
-                        <h3 className="text-lg font-medium text-gray-900">
-                          Profile Information
-                        </h3>
-                        <button
-                          onClick={() => setIsEditing(!isEditing)}
-                          className="flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900"
-                        >
-                          <Edit2 size={16} />
-                          {isEditing ? "Cancel" : "Edit"}
-                        </button>
-                      </div>
-
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div>
-                          <label className="block text-sm text-gray-500 mb-1">
-                            Full Name
-                          </label>
-                          {isEditing ? (
-                            <input
-                              type="text"
-                              defaultValue={user.name}
-                              className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900"
-                            />
-                          ) : (
-                            <p className="text-gray-900">{user.name}</p>
-                          )}
-                        </div>
-                        <div>
-                          <label className="block text-sm text-gray-500 mb-1">
-                            Email Address
-                          </label>
-                          {isEditing ? (
-                            <input
-                              type="email"
-                              defaultValue={user.email}
-                              className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900"
-                            />
-                          ) : (
-                            <p className="text-gray-900">{user.email}</p>
-                          )}
-                        </div>
-                        <div>
-                          <label className="block text-sm text-gray-500 mb-1">
-                            Phone Number
-                          </label>
-                          {isEditing ? (
-                            <input
-                              type="tel"
-                              defaultValue={user.phone}
-                              className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900"
-                            />
-                          ) : (
-                            <p className="text-gray-900">{user.phone}</p>
-                          )}
-                        </div>
-                      </div>
-
-                      {isEditing && (
-                        <div className="flex gap-3 mt-4">
-                          <button className="px-4 py-2 bg-gray-900 text-white rounded-lg text-sm font-medium hover:bg-gray-800 transition-colors">
-                            Save Changes
-                          </button>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Password Change */}
-                    <div className="border-b border-gray-200 pb-6">
-                      <h3 className="text-lg font-medium text-gray-900 mb-4">
-                        Change Password
-                      </h3>
-                      <div className="space-y-4 max-w-md">
-                        <div>
-                          <label className="block text-sm text-gray-500 mb-1">
-                            Current Password
-                          </label>
-                          <input
-                            type="password"
-                            className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-sm text-gray-500 mb-1">
-                            New Password
-                          </label>
-                          <input
-                            type="password"
-                            className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-sm text-gray-500 mb-1">
-                            Confirm New Password
-                          </label>
-                          <input
-                            type="password"
-                            className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900"
-                          />
-                        </div>
-                        <button className="px-4 py-2 bg-gray-900 text-white rounded-lg text-sm font-medium hover:bg-gray-800 transition-colors">
-                          Update Password
-                        </button>
-                      </div>
-                    </div>
-
-                    {/* Preferences */}
-                    <div>
-                      <h3 className="text-lg font-medium text-gray-900 mb-4">
-                        Preferences
-                      </h3>
-                      <div className="space-y-3">
-                        <label className="flex items-center gap-3">
-                          <input
-                            type="checkbox"
-                            className="w-4 h-4 text-gray-900 rounded border-gray-300"
-                          />
-                          <span className="text-sm text-gray-600">
-                            Email me about order updates
-                          </span>
-                        </label>
-                        <label className="flex items-center gap-3">
-                          <input
-                            type="checkbox"
-                            className="w-4 h-4 text-gray-900 rounded border-gray-300"
-                          />
-                          <span className="text-sm text-gray-600">
-                            Email me about promotions and deals
-                          </span>
-                        </label>
-                        <label className="flex items-center gap-3">
-                          <input
-                            type="checkbox"
-                            className="w-4 h-4 text-gray-900 rounded border-gray-300"
-                          />
-                          <span className="text-sm text-gray-600">
-                            SMS notifications for delivery updates
-                          </span>
-                        </label>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
             </div>
           </div>
         </div>

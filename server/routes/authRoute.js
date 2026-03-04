@@ -14,7 +14,7 @@ const limiter = require("../middlewares/rateLimiterMiddleware");
 const router = express.Router();
 
 // register
-router.post("/register", limiter, register);
+router.post("/register",limiter, register);
 router.post("/verify-register-otp", limiter, verifyOTP);
 router.post("/resend-register-otp", limiter, resendOTP);
 
