@@ -22,8 +22,6 @@ router.post("/resend-register-otp", limiter, resendOTP);
 router.post("/login", limiter, loginWithOTP);
 router.post("/verify-login-otp", limiter, loginOtpVerify);
 router.post("/resend-login-otp", limiter, resendLoginOTP);
-// router.get("/all-users",getAllUsers)
-
 router.get("/private", protect, privateRoute);
 
 module.exports = router;

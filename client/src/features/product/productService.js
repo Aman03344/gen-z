@@ -2,6 +2,12 @@ import axios from "axios";
 
 const API_URL = "/api/products/";
 
+// Konsa URL hit ho raha hai check karo
+console.log("Request URL:", API_URL + "products/");
+
+// Token check karo
+console.log("Token exists:", !!localStorage.getItem("token"));
+
 // ================= GET ALL PRODUCTS =================
 const getAllProducts = async () => {
   const response = await axios.get(API_URL);

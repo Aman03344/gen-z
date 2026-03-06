@@ -13,7 +13,6 @@ const app = express();
 
 connectDB();
 
-app.use(errhandler);
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -42,6 +41,7 @@ app.use("/api/admin", require("./routes/adminRoute"));
 app.get("/", (req, res) => {
   res.json({ message: "Welcome to Cothes API's" });
 });
+app.use(errhandler);
 
 app.listen(PORT, () => {
   console.log(`SERVER RUNNING ON PORT: ${PORT}`.cyan);
