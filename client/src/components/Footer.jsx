@@ -329,6 +329,11 @@ const Footer = () => {
                 Privacy Policy
               </button>
               <button
+                className="text-xs text-gray-500 hover:text-gray-900 transition-colors"
+              >
+                Return Policy
+              </button>
+              <button
                 onClick={() => openModal("terms")}
                 className="text-xs text-gray-500 hover:text-gray-900 transition-colors"
               >

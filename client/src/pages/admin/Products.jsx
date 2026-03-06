@@ -5,158 +5,211 @@ import {
   Plus,
   X,
   Search,
-  Filter,
-  Download,
-  ChevronDown,
-  Package,
-  Tag,
   DollarSign,
   Archive,
-  Eye,
-  Copy,
-  MoreHorizontal,
+  Package,
+  ChevronDown,
+  Percent,
 } from "lucide-react";
-import Table from "../../components/admin/Table";
-import Button from "../../components/Button";
-import Input from "../../components/Input";
-import { products } from "../../data/mockData";
 
 const Products = () => {
-  const [showModal, setShowModal] = useState(false);
-  const [modalMode, setModalMode] = useState("add"); // 'add' or 'edit'
-  const [searchTerm, setSearchTerm] = useState("");
-  const [categoryFilter, setCategoryFilter] = useState("all");
-  const [selectedProducts, setSelectedProducts] = useState([]);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [selectedProductId, setSelectedProductId] = useState(null);
 
-  // Filter products based on search and filters
-  const filteredProducts = products.filter((product) => {
-    const matchesSearch =
-      product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      product.brand.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory =
-      categoryFilter === "all" || product.category === categoryFilter;
-    return matchesSearch && matchesCategory;
+  // Form state according to MongoDB schema
+  const [formData, setFormData] = useState({
+    name: "",
+    description: "",
+    brand: "",
+    category: "",
+    price: "",
+    discountPrice: "",
+    discountPercentage: "",
+    countInStock: "",
+    sizes: [],
+    image: [""],
+    isFeatured: false,
   });
 
-  const columns = [
+  // Static product data for cards
+  const [staticProducts, setStaticProducts] = useState([
     {
-      header: "Image",
-      accessor: "image",
-      render: (row) => (
-        <div className="relative group">
-          <img
-            src={row.image}
-            alt={row.name}
-            className="w-12 h-12 object-cover rounded-lg ring-1 ring-gray-200"
-          />
-          <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 rounded-lg transition-all" />
-        </div>
-      ),
+      _id: "4",
+      name: "Leather Biker Jacket",
+      description: "Premium leather jacket with classic biker style",
+      brand: "Zara",
+      category: "Jacket",
+      price: 199.99,
+      discountPrice: 149.99,
+      discountPercentage: 25,
+      countInStock: 8,
+      sizes: ["M", "L", "XL"],
+      image: [
+        "https://images.unsplash.com/photo-1551028719-00167b16eac5?w=400",
+      ],
+      rating: 4.5,
+      numReviews: 23,
+      isFeatured: true,
     },
     {
-      header: "Name",
-      accessor: "name",
-      sortable: true,
-      render: (row) => (
-        <div>
-          <p className="font-medium text-gray-900">{row.name}</p>
-          <p className="text-xs text-gray-500">ID: {row.id}</p>
-        </div>
-      ),
+      _id: "5",
+      name: "Printed Cotton Kurta",
+      description: "Traditional cotton kurta with modern prints",
+      brand: "Manyavar",
+      category: "Kurta",
+      price: 89.99,
+      discountPrice: 67.99,
+      discountPercentage: 24,
+      countInStock: 23,
+      sizes: ["M", "L", "XL", "XXL"],
+      image: [
+        "https://images.unsplash.com/photo-1617127365659-c47fa864d8bc?w=400",
+      ],
+      rating: 4.2,
+      numReviews: 15,
+      isFeatured: false,
     },
-    {
-      header: "Category",
-      accessor: "category",
-      sortable: true,
-      render: (row) => (
-        <span className="px-2 py-1 bg-gray-100 rounded-lg text-xs font-medium text-gray-700">
-          {row.category}
-        </span>
-      ),
-    },
-    {
-      header: "Brand",
-      accessor: "brand",
-      render: (row) => (
-        <span className="text-sm text-gray-600">{row.brand}</span>
-      ),
-    },
-    {
-      header: "Price",
-      accessor: "price",
-      sortable: true,
-      render: (row) => (
-        <div className="flex items-center gap-1">
-          <DollarSign size={14} className="text-gray-400" />
-          <span className="font-semibold text-gray-900">
-            {row.price.toFixed(2)}
-          </span>
-        </div>
-      ),
-    },
-    {
-      header: "Stock",
-      accessor: "stock",
-      sortable: true,
-      render: (row) => {
-        const stockStatus =
-          row.stock > 10
-            ? { color: "text-green-600 bg-green-50", label: "In Stock" }
-            : row.stock > 0
-              ? { color: "text-yellow-600 bg-yellow-50", label: "Low Stock" }
-              : { color: "text-red-600 bg-red-50", label: "Out of Stock" };
+  ]);
 
-        return (
-          <div className="flex items-center gap-2">
-            <span
-              className={`px-2 py-1 rounded-lg text-xs font-medium ${stockStatus.color}`}
-            >
-              {row.stock} units
-            </span>
-          </div>
-        );
-      },
-    },
-  ];
+  // Form handlers
+  const handleInputChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: type === "checkbox" ? checked : value,
+    }));
+  };
 
-  const actions = (row) => (
-    <div className="flex items-center gap-2">
-      <button
-        onClick={() => {
-          setModalMode("edit");
-          setShowModal(true);
-        }}
-        className="p-2 hover:bg-blue-50 rounded-lg transition-colors group"
-        title="Edit Product"
-      >
-        <Edit size={16} className="text-gray-600 group-hover:text-blue-600" />
-      </button>
-      <button
-        className="p-2 hover:bg-green-50 rounded-lg transition-colors group"
-        title="Duplicate Product"
-      >
-        <Copy size={16} className="text-gray-600 group-hover:text-green-600" />
-      </button>
-      <button
-        className="p-2 hover:bg-red-50 rounded-lg transition-colors group"
-        title="Delete Product"
-      >
-        <Trash2 size={16} className="text-gray-600 group-hover:text-red-600" />
-      </button>
-      <button
-        className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-        title="More Actions"
-      >
-        <MoreHorizontal size={16} className="text-gray-600" />
-      </button>
-    </div>
+  const handleSizeToggle = (size) => {
+    setFormData((prev) => ({
+      ...prev,
+      sizes: prev.sizes.includes(size)
+        ? prev.sizes.filter((s) => s !== size)
+        : [...prev.sizes, size],
+    }));
+  };
+
+  const handleImageChange = (index, value) => {
+    const updatedImages = [...formData.image];
+    updatedImages[index] = value;
+    setFormData((prev) => ({ ...prev, image: updatedImages }));
+  };
+
+  const addImageField = () => {
+    setFormData((prev) => ({ ...prev, image: [...prev.image, ""] }));
+  };
+
+  const removeImageField = (index) => {
+    setFormData((prev) => ({
+      ...prev,
+      image: prev.image.filter((_, i) => i !== index),
+    }));
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    // Basic validation
+    if (
+      !formData.name ||
+      !formData.description ||
+      !formData.category ||
+      !formData.price ||
+      !formData.discountPrice ||
+      !formData.discountPercentage ||
+      !formData.countInStock
+    ) {
+      alert("Please fill all required fields");
+      return;
+    }
+
+    if (formData.sizes.length === 0) {
+      alert("Please select at least one size");
+      return;
+    }
+
+    if (!formData.image[0]) {
+      alert("Please provide at least one image URL");
+      return;
+    }
+
+    // Create new product with unique ID
+    const newProduct = {
+      ...formData,
+      _id: Date.now().toString(),
+      price: parseFloat(formData.price),
+      discountPrice: parseFloat(formData.discountPrice),
+      countInStock: parseInt(formData.countInStock),
+      rating: 0,
+      numReviews: 0,
+      image: formData.image.filter((img) => img.trim() !== ""),
+    };
+
+    // Add to products list
+    setStaticProducts((prev) => [newProduct, ...prev]);
+
+    // Reset form and close modal
+    setFormData({
+      name: "",
+      description: "",
+      brand: "",
+      category: "",
+      price: "",
+      discountPrice: "",
+      discountPercentage: "",
+      countInStock: "",
+      sizes: [],
+      image: [""],
+      isFeatured: false,
+    });
+    setIsAddModalOpen(false);
+  };
+
+  const handleDeleteClick = (productId) => {
+    setSelectedProductId(productId);
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleDeleteConfirm = () => {
+    setStaticProducts((prev) =>
+      prev.filter((p) => p._id !== selectedProductId),
+    );
+    setIsDeleteModalOpen(false);
+    setSelectedProductId(null);
+  };
+
+  // Stats summary
+  const totalProducts = staticProducts.length;
+  const totalStock = staticProducts.reduce((sum, p) => sum + p.countInStock, 0);
+  const totalValue = staticProducts.reduce(
+    (sum, p) => sum + p.price * p.countInStock,
+    0,
   );
+  const outOfStock = staticProducts.filter((p) => p.countInStock === 0).length;
 
-  // Summary stats
-  const totalProducts = products.length;
-  const totalStock = products.reduce((sum, p) => sum + p.stock, 0);
-  const totalValue = products.reduce((sum, p) => sum + p.price * p.stock, 0);
-  const outOfStock = products.filter((p) => p.stock === 0).length;
+  // Stock status component
+  const StockStatus = ({ stock }) => {
+    if (stock > 10) {
+      return (
+        <span className="px-2 py-1 bg-green-50 text-green-600 text-xs font-medium rounded-lg">
+          In Stock ({stock})
+        </span>
+      );
+    } else if (stock > 0) {
+      return (
+        <span className="px-2 py-1 bg-yellow-50 text-yellow-600 text-xs font-medium rounded-lg">
+          Low Stock ({stock})
+        </span>
+      );
+    } else {
+      return (
+        <span className="px-2 py-1 bg-red-50 text-red-600 text-xs font-medium rounded-lg">
+          Out of Stock
+        </span>
+      );
+    }
+  };
 
   return (
     <div className="p-8 bg-gray-50 min-h-screen">
@@ -229,21 +282,20 @@ const Products = () => {
         </div>
       </div>
 
-      {/* Main Content */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100">
+      {/* Filters Bar */}
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 mb-6">
         <div className="p-6 border-b border-gray-100">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
             <div className="flex items-center gap-3">
               <h2 className="text-lg font-medium text-gray-900">
-                All Products
+                Product Catalog
               </h2>
               <span className="px-2.5 py-1 bg-gray-100 rounded-full text-xs font-medium text-gray-600">
-                {filteredProducts.length} products
+                {totalProducts} products
               </span>
             </div>
 
             <div className="flex flex-col sm:flex-row gap-3">
-              {/* Search */}
               <div className="relative">
                 <Search
                   size={18}
@@ -252,18 +304,14 @@ const Products = () => {
                 <input
                   type="search"
                   placeholder="Search products..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
                   className="pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent w-full sm:w-64"
                 />
               </div>
 
-              {/* Category Filter */}
               <div className="relative">
                 <select
-                  value={categoryFilter}
-                  onChange={(e) => setCategoryFilter(e.target.value)}
                   className="pl-4 pr-10 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-gray-900 appearance-none cursor-pointer w-full"
+                  defaultValue="all"
                 >
                   <option value="all">All Categories</option>
                   <option value="T-Shirt">T-Shirts</option>
@@ -279,79 +327,144 @@ const Products = () => {
                 />
               </div>
 
-              {/* Add Product Button */}
-              <Button
-                variant="primary"
-                onClick={() => {
-                  setModalMode("add");
-                  setShowModal(true);
-                }}
-                className="!px-4 !py-2.5"
+              <button
+                onClick={() => setIsAddModalOpen(true)}
+                className="inline-flex items-center justify-center px-4 py-2.5 bg-gray-900 text-white text-sm font-medium rounded-xl hover:bg-gray-800 transition-colors"
               >
                 <Plus size={18} className="mr-2" />
                 Add Product
-              </Button>
+              </button>
             </div>
           </div>
-
-          {/* Active Filters */}
-          {(searchTerm || categoryFilter !== "all") && (
-            <div className="mt-4 flex flex-wrap items-center gap-2">
-              <span className="text-xs text-gray-500">Active filters:</span>
-              {searchTerm && (
-                <span className="inline-flex items-center gap-1 px-2 py-1 bg-gray-100 border border-gray-200 rounded-lg text-xs">
-                  Search: "{searchTerm}"
-                  <button
-                    onClick={() => setSearchTerm("")}
-                    className="ml-1 hover:text-gray-900"
-                  >
-                    <X size={12} />
-                  </button>
-                </span>
-              )}
-              {categoryFilter !== "all" && (
-                <span className="inline-flex items-center gap-1 px-2 py-1 bg-gray-100 border border-gray-200 rounded-lg text-xs">
-                  Category: {categoryFilter}
-                  <button
-                    onClick={() => setCategoryFilter("all")}
-                    className="ml-1 hover:text-gray-900"
-                  >
-                    <X size={12} />
-                  </button>
-                </span>
-              )}
-            </div>
-          )}
         </div>
-
-        {/* Table */}
-        <Table
-          columns={columns}
-          data={filteredProducts}
-          actions={actions}
-          onSort={(key, direction) => console.log(key, direction)}
-        />
       </div>
 
-      {/* Add/Edit Product Modal */}
-      {showModal && (
+      {/* Product Cards Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        {staticProducts.map((product) => (
+          <div
+            key={product._id}
+            className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow group"
+          >
+            {/* Product Image */}
+            <div className="relative aspect-square overflow-hidden bg-gray-100">
+              <img
+                src={product.image[0]}
+                alt={product.name}
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+              />
+
+              {/* Discount Badge */}
+              {product.discountPercentage > 0 && (
+                <div className="absolute top-3 left-3 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-lg">
+                  {product.discountPercentage}% OFF
+                </div>
+              )}
+
+              {/* Featured Badge */}
+              {product.isFeatured && (
+                <div className="absolute top-3 right-3 bg-yellow-500 text-white text-xs font-bold px-2 py-1 rounded-lg">
+                  Featured
+                </div>
+              )}
+
+              {/* Action Buttons - Appear on Hover */}
+              <div className="absolute inset-x-0 bottom-0 p-3 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
+                <div className="flex items-center justify-center gap-2">
+                  <button className="p-2 bg-white rounded-full hover:bg-gray-100 transition-colors shadow-lg">
+                    <Edit size={16} className="text-gray-700" />
+                  </button>
+                  <button
+                    onClick={() => handleDeleteClick(product._id)}
+                    className="p-2 bg-white rounded-full hover:bg-red-50 transition-colors shadow-lg"
+                  >
+                    <Trash2 size={16} className="text-red-500" />
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Product Info */}
+            <div className="p-4">
+              {/* Brand & Category */}
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-xs font-medium text-gray-500">
+                  {product.brand}
+                </span>
+                <span className="px-2 py-0.5 bg-gray-100 rounded-full text-xs text-gray-600">
+                  {product.category}
+                </span>
+              </div>
+
+              {/* Product Name */}
+              <h3 className="font-medium text-gray-900 mb-2 line-clamp-2">
+                {product.name}
+              </h3>
+
+              {/* Price */}
+              <div className="flex items-baseline gap-2 mb-3">
+                <span className="text-xl font-bold text-gray-900">
+                  ${product.discountPrice.toFixed(2)}
+                </span>
+                <span className="text-sm text-gray-400 line-through">
+                  ${product.price.toFixed(2)}
+                </span>
+              </div>
+
+              {/* Rating */}
+              <div className="flex items-center gap-1 mb-2">
+                <div className="flex">
+                  {[...Array(5)].map((_, i) => (
+                    <span key={i} className="text-yellow-400 text-sm">
+                      {i < Math.floor(product.rating) ? "★" : "☆"}
+                    </span>
+                  ))}
+                </div>
+                <span className="text-xs text-gray-500">
+                  ({product.numReviews})
+                </span>
+              </div>
+
+              {/* Sizes */}
+              <div className="flex flex-wrap gap-1 mb-3">
+                {product.sizes.map((size) => (
+                  <span
+                    key={size}
+                    className="px-2 py-0.5 bg-gray-50 border border-gray-200 rounded text-xs text-gray-600"
+                  >
+                    {size}
+                  </span>
+                ))}
+              </div>
+
+              {/* Stock Status & ID */}
+              <div className="flex items-center justify-between pt-3 border-t border-gray-100">
+                <StockStatus stock={product.countInStock} />
+                <span className="text-xs text-gray-400">
+                  ID: {product._id.slice(0, 8)}
+                </span>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Add Product Modal */}
+      {isAddModalOpen && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto animate-in fade-in zoom-in duration-300">
+          <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             {/* Modal Header */}
             <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
               <div>
                 <h2 className="text-2xl font-light text-gray-900">
-                  {modalMode === "add" ? "Add New" : "Edit"}{" "}
-                  <span className="font-medium">Product</span>
+                  Add New <span className="font-medium">Product</span>
                 </h2>
                 <p className="text-sm text-gray-500 mt-1">
-                  {modalMode === "add"
-                    ? "Create a new product in your catalog."
-                    : "Update product information."}
+                  Create a new product in your catalog.
                 </p>
               </div>
               <button
-                onClick={() => setShowModal(false)}
+                onClick={() => setIsAddModalOpen(false)}
                 className="p-2 hover:bg-gray-100 rounded-full transition-colors"
               >
                 <X size={20} className="text-gray-500" />
@@ -359,64 +472,82 @@ const Products = () => {
             </div>
 
             {/* Modal Body */}
-            <form className="p-6 space-y-6">
+            <form onSubmit={handleSubmit} className="p-6 space-y-6">
               {/* Product Name */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Product Name
+                  Product Name <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleInputChange}
                   placeholder="e.g., Oversized Cotton Sweater"
-                  className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent transition-all"
+                  className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-gray-900"
+                  required
                 />
               </div>
 
               {/* Description */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Description
+                  Description <span className="text-red-500">*</span>
                 </label>
                 <textarea
+                  name="description"
+                  value={formData.description}
+                  onChange={handleInputChange}
                   rows="4"
-                  placeholder="Enter product description, features, and details..."
-                  className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent transition-all resize-none"
-                ></textarea>
+                  placeholder="Enter product description..."
+                  className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-gray-900 resize-none"
+                  required
+                />
               </div>
 
               {/* Brand and Category */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Brand
+                    Brand <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
-                    placeholder="e.g., DEERIO, Urban Fit"
-                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                    name="brand"
+                    value={formData.brand}
+                    onChange={handleInputChange}
+                    placeholder="e.g., DEERIO"
+                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-gray-900"
+                    required
                   />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Category
+                    Category <span className="text-red-500">*</span>
                   </label>
-                  <select className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-gray-900 appearance-none">
-                    <option>Select category</option>
-                    <option>T-Shirt</option>
-                    <option>Shirt</option>
-                    <option>Jeans</option>
-                    <option>Hoodie</option>
-                    <option>Jacket</option>
-                    <option>Kurta</option>
+                  <select
+                    name="category"
+                    value={formData.category}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-gray-900 appearance-none"
+                    required
+                  >
+                    <option value="">Select category</option>
+                    <option value="T-Shirt">T-Shirt</option>
+                    <option value="Shirt">Shirt</option>
+                    <option value="Jeans">Jeans</option>
+                    <option value="Jacket">Jacket</option>
+                    <option value="Hoodie">Hoodie</option>
+                    <option value="Kurta">Kurta</option>
                   </select>
                 </div>
               </div>
 
-              {/* Price and Stock */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {/* Price Fields */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Price ($)
+                    Price ($) <span className="text-red-500">*</span>
                   </label>
                   <div className="relative">
                     <DollarSign
@@ -425,82 +556,200 @@ const Products = () => {
                     />
                     <input
                       type="number"
+                      name="price"
+                      value={formData.price}
+                      onChange={handleInputChange}
                       step="0.01"
                       placeholder="0.00"
-                      className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-gray-900"
+                      className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl"
+                      required
                     />
                   </div>
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Stock Quantity
+                    Discount Price <span className="text-red-500">*</span>
                   </label>
-                  <input
-                    type="number"
-                    placeholder="0"
-                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-gray-900"
-                  />
+                  <div className="relative">
+                    <DollarSign
+                      size={18}
+                      className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                    />
+                    <input
+                      type="number"
+                      name="discountPrice"
+                      value={formData.discountPrice}
+                      onChange={handleInputChange}
+                      step="0.01"
+                      placeholder="0.00"
+                      className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl"
+                      required
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Discount % <span className="text-red-500">*</span>
+                  </label>
+                  <div className="relative">
+                    <Percent
+                      size={18}
+                      className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                    />
+                    <input
+                      type="number"
+                      name="discountPercentage"
+                      value={formData.discountPercentage}
+                      onChange={handleInputChange}
+                      placeholder="20"
+                      className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl"
+                      required
+                    />
+                  </div>
                 </div>
               </div>
 
-              {/* Image Upload */}
+              {/* Stock */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Product Images
+                  Stock Quantity <span className="text-red-500">*</span>
                 </label>
-                <div className="border-2 border-dashed border-gray-200 rounded-xl p-6 text-center hover:border-gray-300 transition-colors">
-                  <input
-                    type="file"
-                    multiple
-                    className="hidden"
-                    id="image-upload"
-                  />
-                  <label htmlFor="image-upload" className="cursor-pointer">
-                    <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                      <Plus size={20} className="text-gray-500" />
-                    </div>
-                    <p className="text-sm text-gray-600 mb-1">
-                      Click to upload or drag and drop
-                    </p>
-                    <p className="text-xs text-gray-400">
-                      PNG, JPG, WebP up to 5MB
-                    </p>
-                  </label>
-                </div>
+                <input
+                  type="number"
+                  name="countInStock"
+                  value={formData.countInStock}
+                  onChange={handleInputChange}
+                  placeholder="0"
+                  className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl"
+                  required
+                />
               </div>
 
-              {/* Sizes (Optional) */}
+              {/* Image URLs */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Available Sizes
+                  Product Image URLs <span className="text-red-500">*</span>
                 </label>
-                <div className="flex flex-wrap gap-2">
-                  {["XS", "S", "M", "L", "XL", "XXL"].map((size) => (
-                    <label key={size} className="flex items-center gap-2">
+                <div className="space-y-2">
+                  {formData.image.map((url, index) => (
+                    <div key={index} className="flex gap-2">
                       <input
-                        type="checkbox"
-                        className="w-4 h-4 text-gray-900 rounded border-gray-300"
+                        type="text"
+                        value={url}
+                        onChange={(e) =>
+                          handleImageChange(index, e.target.value)
+                        }
+                        placeholder={`Image URL ${index + 1}`}
+                        className="flex-1 px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-gray-900"
                       />
-                      <span className="text-sm text-gray-600">{size}</span>
-                    </label>
+                      {formData.image.length > 1 && (
+                        <button
+                          type="button"
+                          onClick={() => removeImageField(index)}
+                          className="p-3 hover:bg-red-50 rounded-xl transition-colors"
+                        >
+                          <X size={16} className="text-red-500" />
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                  <button
+                    type="button"
+                    onClick={addImageField}
+                    className="flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900 transition-colors"
+                  >
+                    <Plus size={16} />
+                    Add another image URL
+                  </button>
+                </div>
+              </div>
+
+              {/* Sizes */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Available Sizes <span className="text-red-500">*</span>
+                </label>
+                <div className="flex flex-wrap gap-3">
+                  {["S", "M", "L", "XL", "XXL"].map((size) => (
+                    <button
+                      key={size}
+                      type="button"
+                      onClick={() => handleSizeToggle(size)}
+                      className={`w-12 h-12 rounded-xl text-sm font-medium border-2 transition-all ${
+                        formData.sizes.includes(size)
+                          ? "border-gray-900 bg-gray-900 text-white"
+                          : "border-gray-200 bg-gray-50 text-gray-600 hover:border-gray-400"
+                      }`}
+                    >
+                      {size}
+                    </button>
                   ))}
                 </div>
               </div>
 
+              {/* Featured Checkbox */}
+              <div className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  name="isFeatured"
+                  checked={formData.isFeatured}
+                  onChange={handleInputChange}
+                  className="w-4 h-4 text-gray-900 border-gray-300 rounded focus:ring-gray-900"
+                />
+                <label className="text-sm text-gray-700">
+                  Feature this product
+                </label>
+              </div>
+
               {/* Form Actions */}
               <div className="flex gap-3 pt-4 border-t border-gray-200">
-                <Button variant="primary" size="lg" className="flex-1">
-                  {modalMode === "add" ? "Add Product" : "Save Changes"}
-                </Button>
-                <Button
-                  variant="outline"
-                  size="lg"
-                  onClick={() => setShowModal(false)}
+                <button
+                  type="submit"
+                  className="flex-1 py-3 bg-gray-900 text-white rounded-xl font-medium hover:bg-gray-800 transition-colors"
+                >
+                  Add Product
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setIsAddModalOpen(false)}
+                  className="px-6 py-3 border border-gray-200 rounded-xl text-gray-700 hover:bg-gray-50 transition-colors font-medium"
                 >
                   Cancel
-                </Button>
+                </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirm Modal */}
+      {isDeleteModalOpen && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl p-6 max-w-sm w-full shadow-xl">
+            <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Trash2 size={22} className="text-red-600" />
+            </div>
+            <h3 className="text-lg font-semibold text-gray-900 text-center mb-2">
+              Delete Product?
+            </h3>
+            <p className="text-sm text-gray-500 text-center mb-6">
+              This action cannot be undone. The product will be permanently
+              removed from your catalog.
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={handleDeleteConfirm}
+                className="flex-1 py-2.5 bg-red-600 text-white rounded-xl font-medium hover:bg-red-700 transition-colors"
+              >
+                Delete
+              </button>
+              <button
+                onClick={() => setIsDeleteModalOpen(false)}
+                className="flex-1 py-2.5 border border-gray-200 rounded-xl text-gray-700 hover:bg-gray-50 transition-colors font-medium"
+              >
+                Cancel
+              </button>
+            </div>
           </div>
         </div>
       )}

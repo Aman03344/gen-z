@@ -1,31 +1,88 @@
-import { useState } from "react";
-import { ListFilter as Filter, ChevronDown, X } from "lucide-react";
-import ProductCard from "../components/ProductCard";
-import { products } from "../data/mockData";
+import { useEffect, useState } from "react";
+import { ListFilter as Filter, ChevronDown, X, Star } from "lucide-react";
+import { useDispatch, useSelector } from "react-redux";
+import { getAllProducts } from "../features/product/productSlice";
+import { Link } from "react-router-dom";
 
 const Shop = () => {
+  const dispatch = useDispatch();
+  const { products, isLoading, isError } = useSelector(
+    (state) => state.products,
+  );
+
+  console.log(products);
+
   const [showFilters, setShowFilters] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState("");
-  const [priceRange, setPriceRange] = useState([0, 300]);
+  const [priceRange, setPriceRange] = useState([0, 10000]);
   const [selectedBrand, setSelectedBrand] = useState("");
   const [sortBy, setSortBy] = useState("featured");
 
-  const categories = ["T-Shirt", "Shirt", "Jeans", "Hoodie", "Jacket", "Kurta"];
-  const brands = ["DEERIO", "Urban Fit", "Premium Co"];
+  useEffect(() => {
+    dispatch(getAllProducts());
+    window.scrollTo(0, 0);
+  }, [dispatch]);
+
+  const categories = [...new Set(products.map((p) => p.category))];
+  const brands = [...new Set(products.map((p) => p.brand))];
 
   const filteredProducts = products.filter((product) => {
     if (selectedCategory && product.category !== selectedCategory) return false;
     if (selectedBrand && product.brand !== selectedBrand) return false;
-    if (product.price < priceRange[0] || product.price > priceRange[1])
+    const productPrice = product.discountPrice || product.price;
+    if (productPrice < priceRange[0] || productPrice > priceRange[1])
       return false;
     return true;
+  });
+
+  const sortedProducts = [...filteredProducts].sort((a, b) => {
+    const priceA = a.discountPrice || a.price;
+    const priceB = b.discountPrice || b.price;
+
+    switch (sortBy) {
+      case "price-low":
+        return priceA - priceB;
+      case "price-high":
+        return priceB - priceA;
+      case "newest":
+        return new Date(b.createdAt) - new Date(a.createdAt);
+      default:
+        return 0;
+    }
   });
 
   const activeFiltersCount = [
     selectedCategory,
     selectedBrand,
-    priceRange[1] < 300 ? "price" : null,
+    priceRange[1] < 10000 ? "price" : null,
   ].filter(Boolean).length;
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-gray-200 border-t-gray-900 rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading products...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-red-600 text-lg mb-2">Error loading products</p>
+          <button
+            onClick={() => dispatch(getAllProducts())}
+            className="text-sm text-gray-900 bg-gray-100 hover:bg-gray-200 px-6 py-2.5 rounded-full transition-colors"
+          >
+            Try Again
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -58,7 +115,7 @@ const Shop = () => {
 
             <p className="text-sm text-gray-500">
               <span className="font-medium text-gray-900">
-                {filteredProducts.length}
+                {sortedProducts.length}
               </span>{" "}
               products
             </p>
@@ -88,7 +145,7 @@ const Shop = () => {
         </div>
 
         {/* Active Filters */}
-        {(selectedCategory || selectedBrand || priceRange[1] < 300) && (
+        {(selectedCategory || selectedBrand || priceRange[1] < 10000) && (
           <div className="flex flex-wrap items-center gap-2 mb-6">
             <span className="text-sm text-gray-500 mr-2">Active filters:</span>
 
@@ -116,11 +173,11 @@ const Shop = () => {
               </span>
             )}
 
-            {priceRange[1] < 300 && (
+            {priceRange[1] < 10000 && (
               <span className="inline-flex items-center gap-1 px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-sm">
                 Under ₹{priceRange[1]}
                 <button
-                  onClick={() => setPriceRange([0, 300])}
+                  onClick={() => setPriceRange([0, 10000])}
                   className="ml-1 hover:text-gray-900"
                 >
                   <X size={14} />
@@ -132,7 +189,7 @@ const Shop = () => {
               onClick={() => {
                 setSelectedCategory("");
                 setSelectedBrand("");
-                setPriceRange([0, 300]);
+                setPriceRange([0, 10000]);
               }}
               className="text-sm text-gray-500 hover:text-gray-900 underline-offset-2 hover:underline"
             >
@@ -153,7 +210,7 @@ const Shop = () => {
                   onClick={() => {
                     setSelectedCategory("");
                     setSelectedBrand("");
-                    setPriceRange([0, 300]);
+                    setPriceRange([0, 10000]);
                   }}
                   className="text-xs text-gray-500 hover:text-gray-900 transition-colors"
                 >
@@ -162,30 +219,32 @@ const Shop = () => {
               </div>
 
               {/* Category Filter */}
-              <div className="mb-6 pb-6 border-b border-gray-100">
-                <h4 className="text-sm font-medium text-gray-900 mb-3">
-                  Category
-                </h4>
-                <div className="space-y-2">
-                  {categories.map((category) => (
-                    <label
-                      key={category}
-                      className="flex items-center gap-3 cursor-pointer group"
-                    >
-                      <input
-                        type="radio"
-                        name="category"
-                        checked={selectedCategory === category}
-                        onChange={() => setSelectedCategory(category)}
-                        className="w-4 h-4 text-gray-900 focus:ring-gray-900 border-gray-300"
-                      />
-                      <span className="text-sm text-gray-600 group-hover:text-gray-900 transition-colors">
-                        {category}
-                      </span>
-                    </label>
-                  ))}
+              {categories.length > 0 && (
+                <div className="mb-6 pb-6 border-b border-gray-100">
+                  <h4 className="text-sm font-medium text-gray-900 mb-3">
+                    Category
+                  </h4>
+                  <div className="space-y-2">
+                    {categories.map((category) => (
+                      <label
+                        key={category}
+                        className="flex items-center gap-3 cursor-pointer group"
+                      >
+                        <input
+                          type="radio"
+                          name="category"
+                          checked={selectedCategory === category}
+                          onChange={() => setSelectedCategory(category)}
+                          className="w-4 h-4 text-gray-900 focus:ring-gray-900 border-gray-300"
+                        />
+                        <span className="text-sm text-gray-600 group-hover:text-gray-900 transition-colors">
+                          {category}
+                        </span>
+                      </label>
+                    ))}
+                  </div>
                 </div>
-              </div>
+              )}
 
               {/* Price Range Filter */}
               <div className="mb-6 pb-6 border-b border-gray-100">
@@ -197,7 +256,7 @@ const Shop = () => {
                     <input
                       type="range"
                       min="0"
-                      max="300"
+                      max="10000"
                       value={priceRange[1]}
                       onChange={(e) =>
                         setPriceRange([0, parseInt(e.target.value)])
@@ -209,49 +268,141 @@ const Shop = () => {
                       <span className="text-xs font-medium text-gray-900">
                         ₹{priceRange[1]}
                       </span>
-                      <span className="text-xs text-gray-500">₹300+</span>
+                      <span className="text-xs text-gray-500">₹10000+</span>
                     </div>
                   </div>
                 </div>
               </div>
 
               {/* Brand Filter */}
-              <div className="mb-6">
-                <h4 className="text-sm font-medium text-gray-900 mb-3">
-                  Brand
-                </h4>
-                <div className="space-y-2">
-                  {brands.map((brand) => (
-                    <label
-                      key={brand}
-                      className="flex items-center gap-3 cursor-pointer group"
-                    >
-                      <input
-                        type="radio"
-                        name="brand"
-                        checked={selectedBrand === brand}
-                        onChange={() => setSelectedBrand(brand)}
-                        className="w-4 h-4 text-gray-900 focus:ring-gray-900 border-gray-300"
-                      />
-                      <span className="text-sm text-gray-600 group-hover:text-gray-900 transition-colors">
-                        {brand}
-                      </span>
-                    </label>
-                  ))}
+              {brands.length > 0 && (
+                <div className="mb-6">
+                  <h4 className="text-sm font-medium text-gray-900 mb-3">
+                    Brand
+                  </h4>
+                  <div className="space-y-2">
+                    {brands.map((brand) => (
+                      <label
+                        key={brand}
+                        className="flex items-center gap-3 cursor-pointer group"
+                      >
+                        <input
+                          type="radio"
+                          name="brand"
+                          checked={selectedBrand === brand}
+                          onChange={() => setSelectedBrand(brand)}
+                          className="w-4 h-4 text-gray-900 focus:ring-gray-900 border-gray-300"
+                        />
+                        <span className="text-sm text-gray-600 group-hover:text-gray-900 transition-colors">
+                          {brand}
+                        </span>
+                      </label>
+                    ))}
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
           </aside>
 
           {/* Product Grid */}
           <div className="flex-1">
             <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-              {filteredProducts.map((product) => (
-                <ProductCard key={product.id} product={product} />
-              ))}
+              {sortedProducts.map((product) => {
+                const isOnSale =
+                  product.discountPrice && product.discountPercentage > 0;
+
+                return (
+                  <Link
+                    to={`/product/${product._id}`}
+                    key={product._id}
+                    className="group"
+                  >
+                    <div className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 border border-gray-100">
+                      {/* Image Container */}
+                      <div className="relative aspect-[3/4] overflow-hidden bg-gray-100">
+                        <img
+                          src={product.image[0]}
+                          alt={product.name}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        />
+
+                        {/* Discount Badge */}
+                        {isOnSale && (
+                          <div className="absolute top-3 left-3 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-lg">
+                            {product.discountPercentage}% OFF
+                          </div>
+                        )}
+
+                        {/* Out of Stock Badge */}
+                        {product.countInStock === 0 && (
+                          <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                            <span className="bg-white text-gray-900 text-sm font-medium px-4 py-2 rounded-full">
+                              Out of Stock
+                            </span>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Content */}
+                      <div className="p-4">
+                        {/* Brand */}
+                        <p className="text-xs text-gray-500 mb-1">
+                          {product.brand}
+                        </p>
+
+                        {/* Product Name */}
+                        <h3 className="font-medium text-gray-900 mb-2 line-clamp-2 group-hover:text-gray-700 transition-colors">
+                          {product.name}
+                        </h3>
+
+                        {/* Price Section */}
+                        <div className="flex items-baseline gap-2 mb-2">
+                          {isOnSale ? (
+                            <>
+                              <span className="text-lg font-bold text-gray-900">
+                                ₹{product.discountPrice}
+                              </span>
+                              <span className="text-sm text-gray-400 line-through">
+                                ₹{product.price}
+                              </span>
+                              <span className="text-xs text-green-600 font-medium">
+                                Save ₹{product.price - product.discountPrice}
+                              </span>
+                            </>
+                          ) : (
+                            <span className="text-lg font-bold text-gray-900">
+                              ₹{product.price}
+                            </span>
+                          )}
+                        </div>
+
+                        {/* Rating */}
+                        <div className="flex items-center gap-1">
+                          <div className="flex items-center">
+                            {[...Array(5)].map((_, index) => (
+                              <Star
+                                key={index}
+                                size={16}
+                                className={`${
+                                  index < Math.floor(product.rating)
+                                    ? "text-yellow-400 fill-yellow-400"
+                                    : "text-gray-300"
+                                }`}
+                              />
+                            ))}
+                          </div>
+                          <span className="text-xs text-gray-500">
+                            ({product.numReviews || 0} reviews)
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </Link>
+                );
+              })}
             </div>
 
-            {filteredProducts.length === 0 && (
+            {sortedProducts.length === 0 && (
               <div className="text-center py-16 bg-white rounded-2xl border border-gray-100">
                 <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
                   <Filter size={24} className="text-gray-400" />
@@ -264,7 +415,7 @@ const Shop = () => {
                   onClick={() => {
                     setSelectedCategory("");
                     setSelectedBrand("");
-                    setPriceRange([0, 300]);
+                    setPriceRange([0, 10000]);
                   }}
                   className="text-sm text-gray-900 bg-gray-100 hover:bg-gray-200 px-6 py-2.5 rounded-full transition-colors"
                 >

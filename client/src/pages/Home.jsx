@@ -8,11 +8,62 @@ import {
   Shield,
 } from "lucide-react";
 import ProductCard from "../components/ProductCard";
-import { products, categories } from "../data/mockData";
+import { categories } from "../data/mockData";
+import { useEffect } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { getAllProducts } from "../features/product/productSlice";
 
 const Home = () => {
-  const featuredProducts = products.slice(0, 4);
-  const bestSellers = products.filter((p) => p.originalPrice).slice(0, 4);
+  const dispatch = useDispatch();
+  const { products, isLoading, isError, message } = useSelector(
+    (state) =>
+      state.products || { products: [], isLoading: false, isError: false },
+  );
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+    // Fetch products if not already loaded
+    if (!products || products.length === 0) {
+      dispatch(getAllProducts());
+    }
+  }, [dispatch, products]);
+
+  // Filter products for different sections
+  const featuredProducts = products?.slice(0, 4) || [];
+  const bestSellers =
+    products?.filter((p) => p.discountPrice || p.originalPrice)?.slice(0, 4) ||
+    [];
+
+  // Loading state
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-gray-900 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading amazing products...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Error state
+  if (isError) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-red-600 mb-4">
+            {message || "Failed to load products"}
+          </p>
+          <button
+            onClick={() => dispatch(getAllProducts())}
+            className="px-6 py-2 bg-gray-900 text-white rounded-full hover:bg-gray-800 transition-colors"
+          >
+            Try Again
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen">
@@ -126,9 +177,18 @@ const Home = () => {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
-            {featuredProducts.map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))}
+            {featuredProducts.length > 0 ? (
+              featuredProducts.map((product) => (
+                <ProductCard
+                  key={product._id || product.id}
+                  product={product}
+                />
+              ))
+            ) : (
+              <p className="col-span-full text-center text-gray-500">
+                No featured products available
+              </p>
+            )}
           </div>
         </div>
       </section>
@@ -194,9 +254,18 @@ const Home = () => {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
-            {bestSellers.map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))}
+            {bestSellers.length > 0 ? (
+              bestSellers.map((product) => (
+                <ProductCard
+                  key={product._id || product.id}
+                  product={product}
+                />
+              ))
+            ) : (
+              <p className="col-span-full text-center text-gray-500">
+                No best sellers available
+              </p>
+            )}
           </div>
         </div>
       </section>

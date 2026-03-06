@@ -75,14 +75,6 @@ const Navbar = () => {
             </Link>
 
             {/* Admin Link - Only visible to admin users */}
-            {isAdmin && (
-              <Link
-                to="/admin/dashboard"
-                className="text-red-600 hover:text-red-800 transition-colors font-medium"
-              >
-                Admin
-              </Link>
-            )}
           </div>
 
           <div className="hidden md:flex items-center space-x-4">
@@ -116,17 +108,26 @@ const Navbar = () => {
             {isAuthenticated ? (
               <>
                 {/* Profile Link */}
-                <Link
-                  to="/profile"
-                  className="p-2 hover:bg-gray-100 rounded-full transition-colors border border-gray-200 relative group"
-                  title={user?.name}
-                >
-                  <User size={20} />
-                  {/* Optional: Show user name initial as badge */}
-                  <span className="absolute -bottom-1 -right-1 bg-black text-white text-[8px] rounded-full w-4 h-4 flex items-center justify-center uppercase">
-                    {user?.name?.charAt(0) || "U"}
-                  </span>
-                </Link>
+                {user.isAdmin ? (
+                  <Link
+                    to="/profile"
+                    className="p-2 hover:bg-gray-100 rounded-full transition-colors border border-gray-200 relative group"
+                    title={user?.name}
+                  >
+                    <User size={20} />
+                    {/* Optional: Show user name initial as badge */}
+                    <span className="absolute -bottom-1 -right-1 bg-black text-white text-[8px] rounded-full w-4 h-4 flex items-center justify-center uppercase">
+                      {user?.name?.charAt(0) || "U"}
+                    </span>
+                  </Link>
+                ) : (
+                  <Link
+                    to="/admin"
+                    className="text-red-600 hover:text-red-800 transition-colors font-medium"
+                  >
+                    Admin
+                  </Link>
+                )}
 
                 {/* Logout Button */}
                 <button

@@ -2,7 +2,7 @@ export const products = [
   {
     id: 1,
     name: "Premium Cotton T-Shirt",
-    price: 29.99,
+    price: 2000,
     originalPrice: 39.99,
     category: "T-Shirt",
     brand: "DEERIO",
@@ -11,7 +11,7 @@ export const products = [
     description:
       "Premium quality cotton t-shirt with a modern fit. Perfect for everyday wear.",
     stock: 50,
-    sizes: ["XS", "S", "M", "L", "XL", "XXL"],
+    sizes: ["S", "M", "L", "XL", "XXL"],
   },
   {
     id: 2,
