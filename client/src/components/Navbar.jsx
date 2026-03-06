@@ -9,11 +9,12 @@ import {
   Tag,
   LogOut,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { logOutUser } from "../features/auth/authSlice";
 import DicountMarque from "./DicountMarque";
 import toast from "react-hot-toast";
+import { getCart } from "../features/cart/cartSlice";
 
 const Navbar = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -21,6 +22,11 @@ const Navbar = () => {
 
   // Get user and token from Redux state
   const { user, token } = useSelector((state) => state.auth);
+  const { cart } = useSelector((state) => state.cart);
+
+  useEffect(() => {
+    dispatch(getCart());
+  }, []);
 
   // Check if user is authenticated
   const isAuthenticated = !!token && !!user;
@@ -99,7 +105,7 @@ const Navbar = () => {
                   />
                 </svg>
                 <span className="absolute top-1 right-0 bg-black text-white text-[9px] rounded-full w-4 h-4 flex items-center justify-center">
-                  0
+                  {cart?.count || "0"}
                 </span>
               </Link>
             )}
@@ -110,6 +116,13 @@ const Navbar = () => {
                 {/* Profile Link */}
                 {user.isAdmin ? (
                   <Link
+                    to="/admin"
+                    className="text-red-600 hover:text-red-800 transition-colors font-medium"
+                  >
+                    Admin
+                  </Link>
+                ) : (
+                  <Link
                     to="/profile"
                     className="p-2 hover:bg-gray-100 rounded-full transition-colors border border-gray-200 relative group"
                     title={user?.name}
@@ -117,15 +130,8 @@ const Navbar = () => {
                     <User size={20} />
                     {/* Optional: Show user name initial as badge */}
                     <span className="absolute -bottom-1 -right-1 bg-black text-white text-[8px] rounded-full w-4 h-4 flex items-center justify-center uppercase">
-                      {user?.name?.charAt(0) || "U"}
+                      {user?.user?.name || user?.name?.charAt(0) || "U"}
                     </span>
-                  </Link>
-                ) : (
-                  <Link
-                    to="/admin"
-                    className="text-red-600 hover:text-red-800 transition-colors font-medium"
-                  >
-                    Admin
                   </Link>
                 )}
 
@@ -236,7 +242,7 @@ const Navbar = () => {
                 >
                   <div className="flex items-center gap-2">
                     <ShoppingCart size={18} />
-                    <span>Cart (0)</span>
+                    <span>Cart ({cart?.count || "0"})</span>
                   </div>
                 </Link>
                 <button

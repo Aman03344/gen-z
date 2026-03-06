@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
+import toast from "react-hot-toast";
 import {
-  Heart,
   ShoppingCart,
   Star,
   Truck,
@@ -10,27 +10,44 @@ import {
   Shield,
   Minus,
   Plus,
+  Check,
 } from "lucide-react";
 import Button from "../components/Button";
 import { getProduct } from "../features/product/productSlice";
+import { addToCart, getCart, resetCart } from "../features/cart/cartSlice";
 
 const ProductDetails = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
   const dispatch = useDispatch();
+
   const { product, isLoading, isError, message } = useSelector(
     (state) => state.products,
   );
 
+  const {
+    isLoading: cartLoading,
+    isSuccess,
+    isError: cartError,
+    message: cartMessage,
+  } = useSelector((state) => state.cart);
+
+  const { user } = useSelector((state) => state.auth);
+
   const [selectedSize, setSelectedSize] = useState("");
   const [quantity, setQuantity] = useState(1);
   const [activeImage, setActiveImage] = useState("");
-  const [isWishlisted, setIsWishlisted] = useState(false);
+  const [addedToCart, setAddedToCart] = useState(false);
 
   useEffect(() => {
     window.scrollTo(0, 0);
     if (id) {
       dispatch(getProduct(id));
     }
+    // Reset cart state on component unmount
+    return () => {
+      dispatch(resetCart());
+    };
   }, [dispatch, id]);
 
   useEffect(() => {
@@ -38,6 +55,84 @@ const ProductDetails = () => {
       setActiveImage(product.product.image[0]);
     }
   }, [product]);
+
+  // Handle cart success/error
+  useEffect(() => {
+    if (isSuccess) {
+      toast.success("Product added to cart successfully!", {
+        icon: "🛒",
+        duration: 3000,
+      });
+      setAddedToCart(true);
+      setTimeout(() => setAddedToCart(false), 3000);
+      dispatch(resetCart());
+      dispatch(getCart());
+    }
+    if (cartError) {
+      toast.error(cartMessage || "Failed to add to cart", {
+        duration: 4000,
+      });
+      dispatch(resetCart());
+    }
+  }, [isSuccess, cartError, cartMessage, dispatch]);
+
+  const handleAddToCart = () => {
+    // Check if user is logged in
+    if (!user) {
+      toast.error("Please login to add items to cart", {
+        icon: "🔒",
+        duration: 3000,
+      });
+      navigate("/login");
+      return;
+    }
+
+    // Check if size is selected (if sizes exist)
+    if (productData.sizes?.length > 0 && !selectedSize) {
+      toast.error("Please select a size", {
+        icon: "📏",
+        duration: 3000,
+      });
+      return;
+    }
+
+    // Check stock
+    if (quantity > productData.countInStock) {
+      toast.error(`Only ${productData.countInStock} items available in stock`, {
+        duration: 3000,
+      });
+      return;
+    }
+
+    const cartData = {
+      productId: productData._id,
+      quantity: quantity,
+      // You can add size if your backend supports it
+      // size: selectedSize,
+    };
+
+    dispatch(addToCart(cartData));
+  };
+
+  const handleBuyNow = () => {
+    if (!user) {
+      toast.error("Please login to continue", {
+        icon: "🔒",
+        duration: 3000,
+      });
+      navigate("/login");
+      return;
+    }
+
+    // First add to cart, then navigate to checkout
+    handleAddToCart();
+    // Navigate to checkout after successful add
+    setTimeout(() => {
+      if (isSuccess) {
+        navigate("/checkout");
+      }
+    }, 1500);
+  };
 
   // Loading state
   if (isLoading) {
@@ -109,7 +204,7 @@ const ProductDetails = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 mb-20">
           {/* Image Gallery */}
           <div className="space-y-4">
-            <div className="aspect-square overflow-hidden rounded-2xl bg-gray-50">
+            <div className="aspect-square overflow-hidden rounded-2xl bg-gray-50 relative">
               <img
                 src={
                   activeImage ||
@@ -119,6 +214,12 @@ const ProductDetails = () => {
                 alt={productData.name}
                 className="w-full h-full object-cover"
               />
+              {addedToCart && (
+                <div className="absolute top-4 right-4 bg-green-500 text-white px-3 py-1 rounded-full text-sm font-medium flex items-center gap-1">
+                  <Check size={16} />
+                  Added to Cart
+                </div>
+              )}
             </div>
             {productData.image?.length > 1 && (
               <div className="grid grid-cols-4 gap-4">
@@ -231,7 +332,7 @@ const ProductDetails = () => {
                   <button
                     onClick={() => quantity > 1 && setQuantity(quantity - 1)}
                     className="p-3 hover:bg-gray-50 transition-colors disabled:opacity-50"
-                    disabled={quantity <= 1}
+                    disabled={quantity <= 1 || cartLoading}
                   >
                     <Minus size={16} />
                   </button>
@@ -240,8 +341,11 @@ const ProductDetails = () => {
                   </span>
                   <button
                     onClick={() => setQuantity(quantity + 1)}
-                    className="p-3 hover:bg-gray-50 transition-colors"
-                    disabled={quantity >= (productData.countInStock || 10)}
+                    className="p-3 hover:bg-gray-50 transition-colors disabled:opacity-50"
+                    disabled={
+                      quantity >= (productData.countInStock || 10) ||
+                      cartLoading
+                    }
                   >
                     <Plus size={16} />
                   </button>
@@ -251,14 +355,29 @@ const ProductDetails = () => {
                   variant="primary"
                   size="lg"
                   className="flex-1"
-                  disabled={!selectedSize && productData.sizes?.length > 0}
+                  disabled={
+                    (!selectedSize && productData.sizes?.length > 0) ||
+                    cartLoading ||
+                    productData.countInStock === 0
+                  }
+                  onClick={handleAddToCart}
                 >
-                  <ShoppingCart size={18} className="mr-2" />
-                  Add to Cart
+                  {cartLoading ? (
+                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
+                  ) : (
+                    <ShoppingCart size={18} className="mr-2" />
+                  )}
+                  {cartLoading ? "Adding..." : "Add to Cart"}
                 </Button>
               </div>
 
-              <Button variant="secondary" size="lg" className="w-full">
+              <Button
+                variant="secondary"
+                size="lg"
+                className="w-full"
+                onClick={handleBuyNow}
+                disabled={cartLoading || productData.countInStock === 0}
+              >
                 Buy Now
               </Button>
 

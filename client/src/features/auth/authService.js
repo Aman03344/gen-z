@@ -9,6 +9,8 @@ const API_URL = "http://localhost:8080/api/auth/";
 const register = async (userData) => {
   const response = await axios.post(API_URL + "register", userData);
   localStorage.setItem("tempUser", JSON.stringify(response.data));
+  console.log(response.data);
+
   return response.data;
 };
 
@@ -18,12 +20,14 @@ const verifyRegisterOtp = async (data) => {
   const response = await axios.post(API_URL + "verify-register-otp", data);
   localStorage.setItem("token", JSON.stringify(response.data.token));
   localStorage.setItem("user", JSON.stringify(response.data));
+  console.log(response.data);
   return response.data;
 };
 
 // ================= RESEND REGISTER OTP =================
 const resendRegisterOtp = async (data) => {
   const response = await axios.post(API_URL + "resend-register-otp", data);
+  console.log(response.data);
 
   return response.data;
 };
