@@ -1,7 +1,7 @@
 import axios from "axios";
 
-const API_URL = "http://localhost:8080/api/admin/";
-const PRODUCTS_URL = "http://localhost:5173/api/products/";
+const API_URL = "/api/admin/";
+const PRODUCTS_URL = "/api/products/";
 
 // ================= GET TOKEN =================
 const getToken = () => {
