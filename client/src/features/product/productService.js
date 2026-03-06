@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = "http://localhost:8080/api/products/";
+const API_URL = "https://gen-z-a32n.onrender.com/api/products/";
 
 // ================= GET ALL PRODUCTS =================
 const getAllProducts = async () => {
