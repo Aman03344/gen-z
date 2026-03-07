@@ -1,9 +1,9 @@
 import axios from "axios";
 
-const API_URL = import.meta.env.VITE_BACKEND_URL
+const API_URL = import.meta.env.VITE_BACKEND_URL+"products/"
 
 // Konsa URL hit ho raha hai check karo
-console.log("Request URL:", API_URL + "products/");
+// console.log("Request URL:", API_URL +);
 
 // Token check karo
 console.log("Token exists:", !!localStorage.getItem("token"));
