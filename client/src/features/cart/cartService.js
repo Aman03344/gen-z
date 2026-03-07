@@ -8,12 +8,13 @@ const getToken = () => {
 };
 
 // ===== ADD TO CART =====
-const addToCart = async (cartData) => {
-  const token = getToken();
+const addToCart = async (cartData, token) => {
+  // Accept token as parameter
+  const authToken = token || getToken(); // Use passed token or get from localStorage
 
   const response = await axios.post(API_URL + "add", cartData, {
     headers: {
-      Authorization: `Bearer ${token}`,
+      Authorization: `Bearer ${authToken}`,
     },
   });
 
@@ -21,12 +22,13 @@ const addToCart = async (cartData) => {
 };
 
 // ===== GET CART =====
-const getCart = async () => {
-  const token = getToken();
+const getCart = async (token) => {
+  // Accept token as parameter
+  const authToken = token || getToken();
 
   const response = await axios.get(API_URL, {
     headers: {
-      Authorization: `Bearer ${token}`,
+      Authorization: `Bearer ${authToken}`,
     },
   });
 
@@ -34,12 +36,13 @@ const getCart = async () => {
 };
 
 // ===== UPDATE CART =====
-const updateCart = async (cartData) => {
-  const token = getToken();
+const updateCart = async (cartData, token) => {
+  // Accept token as parameter
+  const authToken = token || getToken();
 
   const response = await axios.put(API_URL + "update", cartData, {
     headers: {
-      Authorization: `Bearer ${token}`,
+      Authorization: `Bearer ${authToken}`,
     },
   });
 
@@ -47,21 +50,19 @@ const updateCart = async (cartData) => {
 };
 
 // ===== REMOVE CART =====
-const removeCart = async (cartData) => {
-  const token = getToken();
+const removeCart = async (cartData, token) => {
+  // Accept token as parameter
+  const authToken = token || getToken();
 
   const response = await axios.delete(API_URL + "remove", {
     headers: {
-      Authorization: `Bearer ${token}`,
+      Authorization: `Bearer ${authToken}`,
     },
     data: cartData,
   });
 
   return response.data;
 };
-
-
-
 
 const cartService = {
   addToCart,

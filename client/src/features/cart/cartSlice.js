@@ -26,6 +26,8 @@ export const addToCart = createAsyncThunk(
 // ===== GET CART =====
 export const getCart = createAsyncThunk("cart/get", async (_, thunkAPI) => {
   try {
+    const token = thunkAPI.getState().auth?.token;
+
     return await cartService.getCart();
   } catch (error) {
     return thunkAPI.rejectWithValue(error.response.data.message);
@@ -55,8 +57,6 @@ export const removeCart = createAsyncThunk(
     }
   },
 );
-
-
 
 const cartSlice = createSlice({
   name: "cart",

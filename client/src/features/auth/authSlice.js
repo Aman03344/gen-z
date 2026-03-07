@@ -213,8 +213,12 @@ const authSlice = createSlice({
         state.isOtpVerificationLoading = false;
         state.isOtpVerificationSuccess = true;
 
+        // if (action.payload.token) {
+        //   state.user = action.payload.user;
+        //   state.token = action.payload.token;
+        // }
         if (action.payload.token) {
-          state.user = action.payload.user;
+          state.user = action.payload.user; // Make sure this matches
           state.token = action.payload.token;
         }
       })

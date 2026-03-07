@@ -114,7 +114,7 @@ const Navbar = () => {
             {isAuthenticated ? (
               <>
                 {/* Profile Link */}
-                {user.isAdmin ? (
+                {user?.isAdmin ? (
                   <Link
                     to="/admin"
                     className="text-red-600 hover:text-red-800 transition-colors font-medium"
