@@ -1,7 +1,7 @@
 import axios from "axios";
 
-const API_URL = "/api/admin/";
-const PRODUCTS_URL = "/api/products/";
+const API_URL = import.meta.env.VITE_BACKEND_URL+"admin/";
+const PRODUCTS_URL = import.meta.env.VITE_BACKEND_URL+"/products/";
 
 // ================= GET TOKEN =================
 const getToken = () => {

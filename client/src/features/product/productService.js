@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = "/api/products/";
+const API_URL = import.meta.env.VITE_BACKEND_URL
 
 // Konsa URL hit ho raha hai check karo
 console.log("Request URL:", API_URL + "products/");
