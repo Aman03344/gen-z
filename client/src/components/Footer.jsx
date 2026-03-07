@@ -288,7 +288,8 @@ const Footer = () => {
             <ul className="space-y-3 text-sm text-gray-500">
               <li className="flex items-start gap-3">
                 <span className="text-gray-400">
-                  45 Karol Bagh Markett New Delhi, DL 110005
+                  45 Karol Bagh Market <br />
+                  New Delhi, DL 110005
                 </span>
               </li>
               <li className="flex items-start gap-3">
