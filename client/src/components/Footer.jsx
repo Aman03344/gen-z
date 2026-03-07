@@ -287,8 +287,9 @@ const Footer = () => {
             <h4 className="text-gray-900 font-medium mb-4">Contact</h4>
             <ul className="space-y-3 text-sm text-gray-500">
               <li className="flex items-start gap-3">
-                <span className="text-gray-400">45 Karol Bagh Markett</span>
-                <span className="text-gray-400">New Delhi, DL 110005</span>
+                <span className="text-gray-400">
+                  45 Karol Bagh Markett New Delhi, DL 110005
+                </span>
               </li>
               <li className="flex items-start gap-3">
                 <span className="text-gray-400"></span>
@@ -329,9 +330,7 @@ const Footer = () => {
               >
                 Privacy Policy
               </button>
-              <button
-                className="text-xs text-gray-500 hover:text-gray-900 transition-colors"
-              >
+              <button className="text-xs text-gray-500 hover:text-gray-900 transition-colors">
                 Return Policy
               </button>
               <button
