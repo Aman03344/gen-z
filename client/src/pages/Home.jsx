@@ -81,7 +81,7 @@ const Home = () => {
         <div className="relative h-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center">
           <div className="max-w-2xl text-white">
             <span className="inline-block px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-sm font-light mb-6">
-              New Collection 2024
+              New Collection 2026
             </span>
             <h1 className="text-5xl md:text-7xl font-light mb-6 tracking-tight">
               Elevate Your

@@ -382,7 +382,7 @@ const ProductDetails = () => {
               </Button>
 
               {/* Stock status */}
-              {productData.countInStock !== undefined && (
+              {/* {productData.countInStock !== undefined && (
                 <p
                   className={`text-sm text-center ${productData.countInStock > 0 ? "text-green-600" : "text-red-600"}`}
                 >
@@ -390,7 +390,7 @@ const ProductDetails = () => {
                     ? `${productData.countInStock} items in stock`
                     : "Out of stock"}
                 </p>
-              )}
+              )} */}
             </div>
 
             {/* Features */}
@@ -401,7 +401,7 @@ const ProductDetails = () => {
                   <p className="text-sm font-medium text-gray-900">
                     Free Shipping
                   </p>
-                  <p className="text-xs text-gray-500">On orders over ₹200</p>
+                  <p className="text-xs text-gray-500">On COD</p>
                 </div>
               </div>
               <div className="flex items-start gap-3">

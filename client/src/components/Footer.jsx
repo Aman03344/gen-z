@@ -287,10 +287,10 @@ const Footer = () => {
             <h4 className="text-gray-900 font-medium mb-4">Contact</h4>
             <ul className="space-y-3 text-sm text-gray-500">
               <li className="flex items-start gap-3">
-                <span className="text-gray-400">123 Fashion Street</span>
+                <span className="text-gray-400">45 Karol Bagh Markett</span>
               </li>
               <li className="flex items-start gap-3">
-                <span className="text-gray-400">New York, NY 10001</span>
+                <span className="text-gray-400"></span>
               </li>
               <li className="flex items-start gap-3">
                 <a
