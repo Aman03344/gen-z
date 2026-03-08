@@ -271,7 +271,7 @@ const ProductDetails = () => {
                   ))}
                 </div>
                 <span className="text-sm text-gray-500">
-                  {productData?.rating || 0} reviews
+                  {productData?.rating || 0}+ reviews
                 </span>
               </div>
             </div>
