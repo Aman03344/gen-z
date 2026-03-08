@@ -410,7 +410,7 @@ const ProductDetails = () => {
                   <p className="text-sm font-medium text-gray-900">
                     Easy Returns
                   </p>
-                  <p className="text-xs text-gray-500">30-day return policy</p>
+                  <p className="text-xs text-gray-500">10-day return policy</p>
                 </div>
               </div>
               <div className="flex items-start gap-3">
