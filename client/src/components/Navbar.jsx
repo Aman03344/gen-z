@@ -263,7 +263,7 @@ const Navbar = () => {
                     </Link>
                   </>
                 )}
-                
+
                 {/* Logout - common for both */}
                 <button
                   onClick={() => {
