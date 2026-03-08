@@ -13,19 +13,7 @@ export const products = [
     stock: 50,
     sizes: ["S", "M", "L", "XL", "XXL"],
   },
-  {
-    id: 2,
-    name: "Classic Denim Shirt",
-    price: 49.99,
-    category: "Shirt",
-    brand: "DEERIO",
-    image:
-      "https://images.pexels.com/photos/2352388/pexels-photo-2352388.jpeg?auto=compress&cs=tinysrgb&w=800",
-    description:
-      "Timeless denim shirt with premium stitching and durable fabric.",
-    stock: 35,
-    sizes: ["S", "M", "L", "XL", "XXL"],
-  },
+
   {
     id: 3,
     name: "Slim Fit Jeans",
