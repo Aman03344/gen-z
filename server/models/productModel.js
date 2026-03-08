@@ -4,63 +4,89 @@ const productSchema = new mongoose.Schema(
   {
     name: {
       type: String,
-      required: true,
+      required: [true, "Product name is required"],
+      trim: true,
     },
 
     description: {
       type: String,
-      required: true,
+      required: [true, "Product description is required"],
     },
 
     brand: {
       type: String,
+      trim: true,
     },
 
     category: {
       type: String,
-      enum: ["T-Shirt", "Shirt", "Jeans", "Jacket", "Hoodie", "Kurta"],
-      required: true,
+      enum: {
+        values: ["T-Shirt", "Shirt", "Jeans", "Jacket", "Hoodie", "Kurta"],
+        message: "{VALUE} is not a valid category",
+      },
+      required: [true, "Product category is required"],
     },
 
     price: {
       type: Number,
-      required: true,
+      required: [true, "Product price is required"],
+      min: [0, "Price cannot be negative"],
     },
 
     discountPrice: {
       type: Number,
-      required: true,
+      default: 0,
+      min: [0, "Discount price cannot be negative"],
     },
+
     discountPercentage: {
-      type: String,
-      required: true,
+      type: Number, // Changed from String to Number
+      default: 0,
+      min: [0, "Discount percentage cannot be negative"],
+      max: [100, "Discount percentage cannot exceed 100"],
     },
 
     countInStock: {
       type: Number,
-      required: true,
+      required: [true, "Stock count is required"],
+      min: [0, "Stock count cannot be negative"],
     },
 
-    sizes: [
-      {
-        type: String,
-        enum: ["S", "M", "L", "XL", "XXL"],
+    sizes: {
+      type: [
+        {
+          type: String,
+          enum: {
+            values: ["S", "M", "L", "XL", "XXL"],
+            message: "{VALUE} is not a valid size",
+          },
+        },
+      ],
+      validate: {
+        validator: function (v) {
+          return v && v.length > 0;
+        },
+        message: "At least one size is required",
       },
-    ],
+    },
 
-    image: [
-      {
-        type: String,
-        required: true,
-        trim: true,
+    image: {
+      type: [
+        {
+          type: String,
+          required: true,
+          trim: true,
+        },
+      ],
+      validate: {
+        validator: function (v) {
+          return v && v.length > 0;
+        },
+        message: "At least one image is required",
       },
-    ],
+    },
+
     rating: {
-      type: Number,
-      default: 0,
-    },
-
-    numReviews: {
       type: Number,
       default: 0,
     },
@@ -73,6 +99,7 @@ const productSchema = new mongoose.Schema(
   { timestamps: true },
 );
 
+// Text search index
 productSchema.index({
   name: "text",
   description: "text",

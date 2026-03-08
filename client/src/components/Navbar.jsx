@@ -79,8 +79,6 @@ const Navbar = () => {
             >
               Contact
             </Link>
-
-            {/* Admin Link - Only visible to admin users */}
           </div>
 
           <div className="hidden md:flex items-center space-x-4">
@@ -113,29 +111,31 @@ const Navbar = () => {
             {/* User Menu - Different for authenticated vs non-authenticated */}
             {isAuthenticated ? (
               <>
-                {/* Profile Link */}
-                {user?.isAdmin ? (
+                {/* Admin Button - for admin users only */}
+                {isAdmin ? (
                   <Link
                     to="/admin"
-                    className="text-red-600 hover:text-red-800 transition-colors font-medium"
+                    className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors text-sm font-medium"
                   >
-                    Admin
+                    <User size={18} />
+                    <span>Admin Panel</span>
                   </Link>
                 ) : (
+                  /* User Icon - for regular users only */
                   <Link
                     to="/profile"
                     className="p-2 hover:bg-gray-100 rounded-full transition-colors border border-gray-200 relative group"
                     title={user?.name}
                   >
                     <User size={20} />
-                    {/* Optional: Show user name initial as badge */}
+                    {/* Show user name initial as badge */}
                     <span className="absolute -bottom-1 -right-1 bg-black text-white text-[8px] rounded-full w-4 h-4 flex items-center justify-center uppercase">
-                      {user?.user?.name || user?.name?.charAt(0) || "U"}
+                      {user?.name?.charAt(0) || "U"}
                     </span>
                   </Link>
                 )}
 
-                {/* Logout Button */}
+                {/* Logout Button - common for both admin and regular users */}
                 <button
                   onClick={handleLogout}
                   className="p-2 hover:bg-gray-100 rounded-full transition-colors text-gray-700 hover:text-red-600"
@@ -208,43 +208,63 @@ const Navbar = () => {
               Contact
             </Link>
 
-            {/* Admin Link in Mobile - Only for admin */}
-            {isAdmin && (
-              <Link
-                to="/admin/dashboard"
-                className="block py-2 text-red-600 hover:text-red-800 font-medium"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Admin Dashboard
-              </Link>
-            )}
-
             {/* Divider */}
             <div className="border-t border-gray-200 my-2"></div>
 
             {/* Mobile User Actions */}
             {isAuthenticated ? (
               <>
-                <Link
-                  to="/profile"
-                  className="block py-2 text-gray-700 hover:text-black"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  <div className="flex items-center gap-2">
-                    <User size={18} />
-                    <span>Profile ({user?.name})</span>
-                  </div>
-                </Link>
-                <Link
-                  to="/mycart"
-                  className="block py-2 text-gray-700 hover:text-black"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  <div className="flex items-center gap-2">
-                    <ShoppingCart size={18} />
-                    <span>Cart ({cart?.count || "0"})</span>
-                  </div>
-                </Link>
+                {isAdmin ? (
+                  /* Admin options in mobile */
+                  <>
+                    <Link
+                      to="/admin"
+                      className="block py-2 text-red-600 hover:text-red-800 font-medium"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      <div className="flex items-center gap-2">
+                        <User size={18} />
+                        <span>Admin Dashboard</span>
+                      </div>
+                    </Link>
+                    <Link
+                      to="/mycart"
+                      className="block py-2 text-gray-700 hover:text-black"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      <div className="flex items-center gap-2">
+                        <ShoppingCart size={18} />
+                        <span>Cart ({cart?.count || "0"})</span>
+                      </div>
+                    </Link>
+                  </>
+                ) : (
+                  /* Regular user options in mobile */
+                  <>
+                    <Link
+                      to="/profile"
+                      className="block py-2 text-gray-700 hover:text-black"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      <div className="flex items-center gap-2">
+                        <User size={18} />
+                        <span>Profile ({user?.name})</span>
+                      </div>
+                    </Link>
+                    <Link
+                      to="/mycart"
+                      className="block py-2 text-gray-700 hover:text-black"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      <div className="flex items-center gap-2">
+                        <ShoppingCart size={18} />
+                        <span>Cart ({cart?.count || "0"})</span>
+                      </div>
+                    </Link>
+                  </>
+                )}
+
+                {/* Logout - common for both */}
                 <button
                   onClick={() => {
                     handleLogout();

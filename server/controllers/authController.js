@@ -399,7 +399,7 @@ const loginOtpVerify = async (req, res) => {
         id: user._id,
         name: user.name,
         email: user.email,
-        role: user.role,
+        isAdmin: user.isAdmin,
       },
     });
   } catch (error) {

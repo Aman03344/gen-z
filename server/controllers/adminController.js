@@ -14,51 +14,95 @@ const addProduct = async (req, res) => {
       countInStock,
       sizes,
       image,
+      rating,
+      isFeatured,
     } = req.body;
 
-    // Basic Validation
+    // Basic Validation - Only required fields
     if (
       !name ||
       !description ||
-      !brand ||
       !category ||
       !price ||
       !countInStock ||
-      !image ||
-      !discountPrice ||
       !sizes ||
-      !discountPercentage
+      !image
     ) {
       return res.status(400).json({
         success: false,
-        message: "Please fill all required fields",
+        message:
+          "Please fill all required fields (name, description, category, price, countInStock, sizes, image)",
       });
     }
 
-    // Discount validation
-    if (discountPrice && discountPrice >= price) {
+    // Image array validation
+    if (!Array.isArray(image) || image.length === 0) {
       return res.status(400).json({
         success: false,
-        message: "Discount price must be less than actual price",
+        message: "At least one image is required",
+      });
+    }
+
+    // Sizes array validation
+    const validSizes = ["S", "M", "L", "XL", "XXL"];
+    const invalidSizes = sizes.filter((size) => !validSizes.includes(size));
+
+    if (invalidSizes.length > 0) {
+      return res.status(400).json({
+        success: false,
+        message: `Invalid sizes: ${invalidSizes.join(", ")}. Valid sizes: S, M, L, XL, XXL`,
+      });
+    }
+
+    // Price validations
+    if (price <= 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Price must be greater than 0",
+      });
+    }
+
+    // Discount validations (if provided)
+    if (discountPrice) {
+      if (discountPrice >= price) {
+        return res.status(400).json({
+          success: false,
+          message: "Discount price must be less than actual price",
+        });
+      }
+
+      // Auto-calculate discount percentage if not provided
+      if (!discountPercentage) {
+        const calculatedDiscount = (
+          ((price - discountPrice) / price) *
+          100
+        ).toFixed(1);
+        req.body.discountPercentage = calculatedDiscount;
+      }
+    }
+
+    // Count in stock validation
+    if (countInStock < 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Count in stock cannot be negative",
       });
     }
 
     const newProduct = await Product.create({
       name,
       description,
-      brand,
+      brand: brand || "", // Default empty string if not provided
       category,
       price,
-      discountPrice,
-      discountPercentage,
+      discountPrice: discountPrice || 0,
+      discountPercentage: discountPercentage || "0",
       countInStock,
       sizes,
       image,
+      rating: rating || 0,
+      isFeatured: isFeatured || false,
     });
-
-    if (!newProduct) {
-      return res.status(400).json({ message: "Failed to create product" });
-    }
 
     res.status(201).json({
       success: true,
@@ -66,6 +110,16 @@ const addProduct = async (req, res) => {
       product: newProduct,
     });
   } catch (error) {
+    // Handle mongoose validation errors
+    if (error.name === "ValidationError") {
+      return res.status(400).json({
+        success: false,
+        message: Object.values(error.errors)
+          .map((err) => err.message)
+          .join(", "),
+      });
+    }
+
     res.status(500).json({
       success: false,
       message: error.message,
@@ -132,20 +186,19 @@ const getAllUsers = async (req, res) => {
     if (users.length === 0) {
       return res.status(404).json({
         success: false,
-        message: "No users found"
+        message: "No users found",
       });
     }
 
     res.status(200).json({
       success: true,
       count: users.length,
-      data: users
+      data: users,
     });
-
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: error.message
+      message: error.message,
     });
   }
 };
