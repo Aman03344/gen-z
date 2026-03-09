@@ -41,18 +41,6 @@ const Sidebar = () => {
       label: "Orders",
       color: "from-orange-500 to-orange-600",
     },
-    {
-      path: "/admin/revenue",
-      icon: DollarSign,
-      label: "Revenue",
-      color: "from-emerald-500 to-emerald-600",
-    },
-    {
-      path: "/admin/settings",
-      icon: Settings,
-      label: "Settings",
-      color: "from-gray-500 to-gray-600",
-    },
   ];
 
   return (

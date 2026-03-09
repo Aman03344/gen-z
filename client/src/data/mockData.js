@@ -100,11 +100,6 @@ export const categories = [
       "https://images.pexels.com/photos/8532616/pexels-photo-8532616.jpeg?auto=compress&cs=tinysrgb&w=400",
   },
   {
-    name: "Shirt",
-    image:
-      "https://images.pexels.com/photos/2352388/pexels-photo-2352388.jpeg?auto=compress&cs=tinysrgb&w=400",
-  },
-  {
     name: "Jeans",
     image:
       "https://images.pexels.com/photos/1082526/pexels-photo-1082526.jpeg?auto=compress&cs=tinysrgb&w=400",

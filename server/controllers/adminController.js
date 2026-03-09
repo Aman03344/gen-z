@@ -1,3 +1,4 @@
+const orderModel = require("../models/orderModel");
 const Product = require("../models/productModel");
 const userModel = require("../models/userModel");
 
@@ -203,4 +204,22 @@ const getAllUsers = async (req, res) => {
   }
 };
 
-module.exports = { addProduct, updateProduct, deleteProduct, getAllUsers };
+const getAllOrders = async (req, res) => {
+  const orders = await orderModel.find();
+  if (!orders) {
+    return res.status(404).json({ message: "" });
+  }
+  res.status(200).json({
+    success: true,
+    count: orders.length,
+    orders,
+  });
+};
+
+module.exports = {
+  addProduct,
+  updateProduct,
+  deleteProduct,
+  getAllUsers,
+  getAllOrders,
+};
